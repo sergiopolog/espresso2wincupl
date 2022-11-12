@@ -5,9 +5,9 @@ public class PAL16L8Specs implements PALSpecs {
 	public static final String PAL_TYPE = "10L8";
 
 	// @formatter:off
-    private static final String[] LABELS_IN =  {  "i1",  "i2",  "i3",  "i4",  "i5",  "i6",  "i7",  "i8",  "i9", "i11",   null,   null,   null,   null,   null,   null,   null,  null };
-    private static final String[] LABELS_IO =  {  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  "io18", "io17", "io16", "io15", "io14", "io13",  null,  null };
-    private static final String[] LABELS_O  =  {  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,   null,   null,   null,   null,   null,   null,  "o19",  "o12" };
+	private static final String[] LABELS_IN =  {  "i1",  "i2",  "i3",  "i4",  "i5",  "i6",  "i7",  "i8",  "i9", "i11",   null,   null,   null,   null,   null,   null,   null,  null };
+	private static final String[] LABELS_IO =  {  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  "io18", "io17", "io16", "io15", "io14", "io13",  null,  null };
+	private static final String[] LABELS_O  =  {  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,   null,   null,   null,   null,   null,   null,  "o19",  "o12" };
 	// @formatter:on
 
 	@Override
