@@ -181,9 +181,26 @@ public class Espresso2Wincupl {
 		return inputPinsSection.toString();
 	}
 
-	private static String createOutputPinsSection(String filename) throws IOException {
+	private static Integer getOutputPinsCount(String filename) throws IOException {
+
+		String phaseRegex = "^#\\sphase\\sis\\s(-+)\\s([0-1]+)$";
+		Pattern phasePattern = Pattern.compile(phaseRegex);
+
+		String phaseLine = Files.lines(Paths.get(filename)).filter(o -> o.matches(phaseRegex)).findFirst().get();
+
+		Matcher matcher = phasePattern.matcher(phaseLine);
+		if (matcher.find()) {
+			return matcher.group(2).split("").length / 2; // Divided by 2 because here OE phase is included for each
+															// pin, too.
+		} else {
+			return 0;
+		}
+	}
+
+	private static String createOutputPinsSection(String filename) throws Exception {
 
 		StringBuilder outputPinsSection = new StringBuilder();
+		int outputCount = 0;
 
 		outputPinsSection.append("/* ********** OUTPUT PINS ********* */ ");
 		outputPinsSection.append("\n");
@@ -206,7 +223,13 @@ public class Espresso2Wincupl {
 			outputPinsSection.append("PIN ").append(outputPins.get(i).replaceAll("\\D", "")).append(" = ")
 					.append(selectedPhase.get(i).equals("0") ? "!" : "").append(outputPins.get(i)).append(" ;");
 			outputPinsSection.append("\n");
+			outputCount++;
+		}
 
+		int detectedOutputCount = getOutputPinsCount(filename);
+		if (outputCount != detectedOutputCount) {
+			throw new Exception(
+					"Invalid equations file. Detected outputs: " + detectedOutputCount + " but have: " + outputCount);
 		}
 
 		outputPinsSection.append("\n");
