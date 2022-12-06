@@ -253,7 +253,7 @@ public class Espresso2Wincupl {
 
 	private static List<String> getOutputPinsSelectedPhase(String filename) throws IOException {
 
-		String phasePositiveRegex = "^#\\sESPRESSO-POS\\((\\d+)\\).+cost\\sis\\sc=(\\d+)\\(\\d+\\).+$";
+		String phasePositiveRegex = "^#\\s(?:ESPRESSO|EXACT)-POS\\((\\d+)\\).+cost\\sis\\sc=(\\d+)\\(\\d+\\).+$";
 		Pattern phasePositivePattern = Pattern.compile(phasePositiveRegex);
 
 		List<Integer> positiveCostsLines = Files.lines(Paths.get(filename)).filter(o -> o.matches(phasePositiveRegex))
@@ -266,7 +266,7 @@ public class Espresso2Wincupl {
 					}
 				}).collect(Collectors.toList());
 
-		String phaseNegativeRegex = "^#\\sESPRESSO-NEG\\((\\d+)\\).+cost\\sis\\sc=(\\d+)\\(\\d+\\).+$";
+		String phaseNegativeRegex = "^#\\s(?:ESPRESSO|EXACT)-NEG\\((\\d+)\\).+cost\\sis\\sc=(\\d+)\\(\\d+\\).+$";
 		Pattern phaseNegativePattern = Pattern.compile(phaseNegativeRegex);
 
 		List<Integer> negativeCostsLines = Files.lines(Paths.get(filename)).filter(o -> o.matches(phaseNegativeRegex))
