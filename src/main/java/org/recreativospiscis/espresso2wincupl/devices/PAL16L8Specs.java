@@ -2,7 +2,7 @@ package org.recreativospiscis.espresso2wincupl.devices;
 
 public class PAL16L8Specs implements PALSpecs {
 
-	public static final String PAL_TYPE = "10L8";
+	public static final String PAL_TYPE = "16L8";
 
 	// @formatter:off
 	private static final String[] LABELS_IN =  {  "i1",  "i2",  "i3",  "i4",  "i5",  "i6",  "i7",  "i8",  "i9", "i11",   null,   null,   null,   null,   null,   null,   null,  null };
