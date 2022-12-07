@@ -50,7 +50,7 @@ public class Espresso2Wincupl {
 		StringBuilder wincuplFileContent = new StringBuilder();
 
 		// set header:
-		wincuplFileContent.append(createWinCuplHeader(palSpecs));
+		wincuplFileContent.append(createWinCuplHeader(palSpecs, filename));
 
 		// set input pins section:
 		wincuplFileContent.append(createInputPinsSection(filename, palSpecs));
@@ -79,10 +79,14 @@ public class Espresso2Wincupl {
 		}).findFirst().get();
 	}
 
-	private static String createWinCuplHeader(PALSpecs palSpecs) {
+	private static String createWinCuplHeader(PALSpecs palSpecs, String filename) {
 		StringBuilder header = new StringBuilder();
 
-		header.append("Name ").append(";");
+		String file = Paths.get(filename).getFileName().toString();
+
+		header.append("Name ")
+				.append(file.substring(0, file.lastIndexOf(".") > 0 ? file.lastIndexOf(".") : file.length()))
+				.append(";");
 		header.append("\n");
 
 		header.append("PartNo ").append(";");
