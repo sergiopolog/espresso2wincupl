@@ -5,12 +5,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.recreativospiscis.espresso2wincupl.devices.PALSpecs;
 
@@ -133,6 +135,27 @@ public class Espresso2Wincupl {
 		}
 	}
 
+	private static Stream<String> combineMultiLineEquations(Stream<String> input) {
+
+		List<String> newLines = new ArrayList<String>();
+		List<String> lines = input.collect(Collectors.toList());
+
+		String outputMultiLineRegex = "^(\\w{1,2}\\d{1,2})\\s=.+[^;]$";
+		Pattern outputMultiLinePattern = Pattern.compile(outputMultiLineRegex);
+
+		for (int i = 0; i < lines.size(); i++) {
+			Matcher matcher = outputMultiLinePattern.matcher(lines.get(i));
+			if (matcher.find()) {
+				newLines.add(lines.get(i) + " " + lines.get(i + 1));
+				i++;
+			} else {
+				newLines.add(lines.get(i));
+			}
+		}
+
+		return newLines.stream();
+	}
+
 	private static String createInputPinsSection(String filename, PALSpecs palSpecs) throws Exception {
 
 		StringBuilder inputPinsSection = new StringBuilder();
@@ -152,16 +175,17 @@ public class Espresso2Wincupl {
 
 		// Get actual output pins:
 		String outputRegex = "^(\\w{1,2}\\d{1,2})\\s=.+;$";
-		Pattern outputPattern = Pattern.compile(outputRegex);
+		Pattern outputPattern = Pattern.compile(outputRegex, Pattern.DOTALL);
 
-		List<String> outputPins = Files.lines(Paths.get(filename)).filter(o -> o.matches(outputRegex)).map(o -> {
-			Matcher matcher = outputPattern.matcher(o);
-			if (matcher.find()) {
-				return matcher.group(1);
-			} else {
-				return null;
-			}
-		}).collect(Collectors.toList());
+		List<String> outputPins = combineMultiLineEquations(Files.lines(Paths.get(filename)))
+				.filter(o -> o.matches(outputRegex)).map(o -> {
+					Matcher matcher = outputPattern.matcher(o);
+					if (matcher.find()) {
+						return matcher.group(1);
+					} else {
+						return null;
+					}
+				}).collect(Collectors.toList());
 
 		// Add also the io pins that don't acts as outputs:
 		List<String> ioPins = Arrays.asList(palSpecs.getLabels_IO()).stream().filter(s -> s != null)
@@ -210,16 +234,17 @@ public class Espresso2Wincupl {
 		outputPinsSection.append("\n");
 
 		String outputRegex = "^(\\w{1,2}\\d{1,2})\\s=.+;$";
-		Pattern outputPattern = Pattern.compile(outputRegex);
+		Pattern outputPattern = Pattern.compile(outputRegex, Pattern.DOTALL);
 
-		List<String> outputPins = Files.lines(Paths.get(filename)).filter(o -> o.matches(outputRegex)).map(o -> {
-			Matcher matcher = outputPattern.matcher(o);
-			if (matcher.find()) {
-				return matcher.group(1);
-			} else {
-				return null;
-			}
-		}).collect(Collectors.toList());
+		List<String> outputPins = combineMultiLineEquations(Files.lines(Paths.get(filename)))
+				.filter(o -> o.matches(outputRegex)).map(o -> {
+					Matcher matcher = outputPattern.matcher(o);
+					if (matcher.find()) {
+						return matcher.group(1);
+					} else {
+						return null;
+					}
+				}).collect(Collectors.toList());
 
 		List<String> selectedPhase = getOutputPinsSelectedPhase(filename);
 
@@ -303,14 +328,14 @@ public class Espresso2Wincupl {
 		equationsSection.append("/* ******** LOGIC EQUATIONS ******* */ ");
 		equationsSection.append("\n\n");
 
-		String equationRegex = "^\\w{1,2}\\d{1,2}\\s=\\s.+;$";
+		String equationRegex = "(?s)^\\w{1,2}\\d{1,2}\\s=\\s.+;$";
 
-		List<String> equations = Files.lines(Paths.get(filename)).filter(o -> o.matches(equationRegex))
-				.collect(Collectors.toList());
+		List<String> equations = combineMultiLineEquations(Files.lines(Paths.get(filename)))
+				.filter(o -> o.matches(equationRegex)).collect(Collectors.toList());
 
 		for (String equation : equations) {
-			equationsSection.append(equation.replaceAll("(\\(|\\))", "").replaceAll("&", " & ")
-					.replaceAll("\\s\\|\\s", "\n\t# ").replaceAll(";", " ;"));
+			equationsSection.append(equation.replaceAll("\\s{2,}", "").replaceAll("(\\(|\\))", "")
+					.replaceAll("&", " & ").replaceAll("\\s\\|\\s", "\n\t# ").replaceAll(";", " ;"));
 			equationsSection.append("\n\n");
 		}
 
